@@ -3,9 +3,10 @@
     <h1>Employee Form</h1>
     <br>
     <form @submit.prevent="employeeForm" id="employeeForm">
+        <input type="text">
         <div>
             <label>Name*</label>
-            <input type="text" v-model="employeeName" >
+            <input type="text" v-model="employeeName">
         </div>
         <div>
             <label>Email*</label>
@@ -67,7 +68,7 @@
 
     <br><br>
 
-    <table border="1">
+    <table border="1" v-show="employeeDatas.length !== 0">
         <thead>
             <tr>
                 <td>id</td>
@@ -79,10 +80,11 @@
                 <td>Salary</td>
                 <td>Work</td>
                 <td>Hobbies</td>
+                <td>Actions</td>
             </tr>
         </thead>
         <tbody>
-            <tr v-for="(value, index) in employeeDatas.value">
+            <tr v-if="employeeDatas" v-for="(value, index) in employeeDatas">
                 <td>{{ value.id }}</td>
                 <td>{{ value.name }}</td>
                 <td>{{ value.email }}</td>
@@ -96,7 +98,9 @@
                         <li v-for="val in value.hobbies">{{ val }}</li>
                     </ul>
                 </td>
+                <td><button @click="updateEmployeeData(value)">Update</button> || <button @click="deleteEmployeeData(value.id)">Delete</button></td>
             </tr>
+            <tr v-else>No record found</tr>
         </tbody>
     </table>
 
@@ -116,19 +120,17 @@
     let employeeWork = ref("");
     let employeeHobbies = ref([]);
 
-    // ref
-
     let employeeDatas = ref([]);
+
+    let updateEmpData = {};
     
     onBeforeMount(async () => {
 
-        employeeDatas.value = await get("employeeData"); 
-
-        console.log(employeeDatas.value);
-
+            employeeDatas.value = JSON.parse(await get("employeeData"));
+            
     })
 
-   async function employeeForm() {
+   const employeeForm = async () => {
 
         const updateHobbies = [];
 
@@ -147,12 +149,31 @@
             work: employeeWork.value,
             hobbies: updateHobbies
         }
-
         employeeDatas.value.push(employeeData);
 
-       await set(JSON.parse(JSON.stringify(employeeDatas.value)), "employeeData")
+       await set(JSON.stringify(employeeDatas.value), "employeeData")
 
         window.location.reload(true);
+
+    }
+
+    const deleteEmployeeData = async (id) => {
+
+        const allEmployeeDatas = JSON.parse(await get("employeeData"));
+
+        const filterEmployeeDatas = allEmployeeDatas.filter((value, index) => value.id !== id);
+
+        await set(JSON.stringify(filterEmployeeDatas), "employeeData");
+
+        window.location.reload(true);
+
+    }
+
+    const updateEmployeeData = async (data) => {
+
+        updateEmpData = JSON.parse(JSON.stringify(data));
+
+        console.log(updateEmpData);
 
     }
 
