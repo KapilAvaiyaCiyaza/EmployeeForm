@@ -1,9 +1,8 @@
 <template>
-
     <h1>Employee Form</h1>
     <br>
     <form @submit.prevent="employeeForm" id="employeeForm">
-        <input type="text">
+        <input type="hidden" :value="updateEmpData.id ? updateEmpData.id : 0" id="employeeId">
         <div>
             <label>Name*</label>
             <input type="text" v-model="employeeName">
@@ -44,8 +43,8 @@
                 <span>Hybrid</span>
             </div>
             <div>
-                <input type="radio" value="Office" v-model="employeeWork">
-                <span>Office</span>
+                <input type="radio" value="On-site" v-model="employeeWork">
+                <span>On-site</span>
             </div>
         </div>
         <div>
@@ -63,8 +62,13 @@
                 <span>Traveling</span>
             </div>
         </div>
-        <input type="submit" value="Submit">
+        <input type="submit" value="Submit" id="employeeSubmitBtn">
     </form>
+
+    <br><br>
+
+    <span>Filter </span><input type="text" placeholder="Enter employee any detail"
+        @keyup="(e) => filterEmployeeData(e.target.value)">
 
     <br><br>
 
@@ -104,42 +108,72 @@
         </tbody>
     </table>
 
+    <div class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+        <div class="flex flex-1 justify-between sm:hidden">
+            <a href="#" class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
+            <a href="#" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
+        </div>
+        <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm text-gray-700">
+                Showing
+                {{ ' ' }}
+                <span class="font-medium">1</span>
+                {{ ' ' }}
+                to
+                {{ ' ' }}
+                <span class="font-medium">{{ employeeDatas.length }}</span>
+                {{ ' ' }}
+                of
+                {{ ' ' }}
+                <span class="font-medium">{{ employeeDatas.length }}</span>
+                {{ ' ' }}
+                results
+                </p>
+            </div>
+        </div>
+  </div>
+
 </template>
 
 <script setup>
 
-    import { onBeforeMount, ref  } from 'vue';
-    import { set, get } from './EmployeeIdb.vue';
+import { onBeforeMount, ref } from 'vue';
+import { set, get } from './EmployeeIdb.vue';
 
-    let employeeName = ref("");
-    let employeeEmail = ref("");
-    let employeeNumber = ref("");
-    let employeeAddress = ref("");
-    let employeeDesignation = ref("");
-    let employeeSalary = ref("");
-    let employeeWork = ref("");
-    let employeeHobbies = ref([]);
+let employeeName = ref("");
+let employeeEmail = ref("");
+let employeeNumber = ref("");
+let employeeAddress = ref("");
+let employeeDesignation = ref("");
+let employeeSalary = ref("");
+let employeeWork = ref("");
+let employeeHobbies = ref([]);
 
-    let employeeDatas = ref([]);
+let employeeDatas = ref([]);
 
-    let updateEmpData = {};
-    
-    onBeforeMount(async () => {
+let updateEmpData = ref({});
 
-            employeeDatas.value = JSON.parse(await get("employeeData"));
-            
-    })
+onBeforeMount(async () => {
 
-   const employeeForm = async () => {
+    employeeDatas.value = JSON.parse(await get("employeeData"));
 
-        const updateHobbies = [];
+})
 
-        for (const item in employeeHobbies.value) {
-            updateHobbies.push(employeeHobbies.value[item])
-        }
-        
+const employeeForm = async () => {
+
+    const employeeId = document.getElementById("employeeId").value;
+
+    const updateHobbies = [];
+
+    for (const item in employeeHobbies.value) {
+        updateHobbies.push(employeeHobbies.value[item])
+    }
+
+    if (employeeId == 0) {
+
         const employeeData = {
-            id: Math.floor(Math.random() * 9999),   
+            id: Math.floor(Math.random() * 9999),
             name: employeeName.value,
             email: employeeEmail.value,
             number: employeeNumber.value,
@@ -151,30 +185,72 @@
         }
         employeeDatas.value.push(employeeData);
 
-       await set(JSON.stringify(employeeDatas.value), "employeeData")
+        await set(JSON.stringify(employeeDatas.value), "employeeData");
 
-        window.location.reload(true);
+    }
+    else {
+
+        const allEmployeeData = JSON.parse(await get("employeeData"));
+
+        const updatedEmployeeData = allEmployeeData.map((value) => value.id == document.getElementById("employeeId").value ? { ...value, name: employeeName.value, email: employeeEmail.value, number: employeeNumber.value, address: employeeAddress.value, designation: employeeDesignation.value, salary: employeeSalary.value, work: employeeWork.value, hobbies: updateHobbies } : value);
+
+        await set(JSON.stringify(updatedEmployeeData), "employeeData")
 
     }
 
-    const deleteEmployeeData = async (id) => {
+    document.getElementById("employeeId").value = "0";
+    document.getElementById("employeeSubmitBtn").value = "Submit";
 
-        const allEmployeeDatas = JSON.parse(await get("employeeData"));
+    window.location.reload(true);
 
-        const filterEmployeeDatas = allEmployeeDatas.filter((value, index) => value.id !== id);
+}
 
-        await set(JSON.stringify(filterEmployeeDatas), "employeeData");
+const deleteEmployeeData = async (id) => {
 
-        window.location.reload(true);
+    const allEmployeeDatas = JSON.parse(await get("employeeData"));
+
+    const filterEmployeeDatas = allEmployeeDatas.filter((value, index) => value.id !== id);
+
+    await set(JSON.stringify(filterEmployeeDatas), "employeeData");
+
+    window.location.reload(true);
+
+}
+
+const updateEmployeeData = async (data) => {
+
+    updateEmpData.value = await JSON.parse(JSON.stringify(data));
+
+    employeeName = ref(updateEmpData.value.name);
+    employeeEmail = ref(updateEmpData.value.email);
+    employeeNumber = ref(updateEmpData.value.number);
+    employeeAddress = ref(updateEmpData.value.address);
+    employeeDesignation = ref(updateEmpData.value.designation);
+    employeeSalary = ref(updateEmpData.value.salary);
+    employeeWork = ref(updateEmpData.value.work);
+    employeeHobbies = ref(updateEmpData.value.hobbies);
+
+    document.getElementById("employeeSubmitBtn").value = "Update Data"
+
+}
+
+const filterEmployeeData = async (data) => {
+
+    const allEmployeeData = JSON.parse(await get("employeeData"));
+
+    const filterEmployeeData = allEmployeeData.filter((value) => value.id == data || value.name == data || value.email == data || value.number == data || value.address == data || value.designation == data || value.salary == data || value.work == data);
+
+    if (filterEmployeeData.length == 0) {
+
+        employeeDatas.value = allEmployeeData
+
+    }
+    else {
+
+        employeeDatas.value = filterEmployeeData
 
     }
 
-    const updateEmployeeData = async (data) => {
-
-        updateEmpData = JSON.parse(JSON.stringify(data));
-
-        console.log(updateEmpData);
-
-    }
+}
 
 </script>
