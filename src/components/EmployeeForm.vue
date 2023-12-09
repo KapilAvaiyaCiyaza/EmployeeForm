@@ -1,78 +1,79 @@
 <template>
-    <h1>Employee Form</h1>
-    <br>
-    <form @submit.prevent="employeeForm" id="employeeForm">
-        <input type="hidden" :value="updateEmpData.id ? updateEmpData.id : 0" id="employeeId">
-        <div>
-            <label>Name*</label>
-            <input type="text" v-model="employeeName">
-        </div>
-        <div>
-            <label>Email*</label>
-            <input type="email" v-model="employeeEmail">
-        </div>
-        <div>
-            <label>Number*</label>
-            <input type="number" v-model="employeeNumber">
-        </div>
-        <div>
-            <label>Address*</label>
-            <textarea v-model="employeeAddress"></textarea>
-        </div>
-        <div>
-            <label>Designation*</label>
-            <select v-model="employeeDesignation">
-                <option value="">--- Select your designation ---</option>
-                <option value="Web Developer">Web Developer</option>
-                <option value="Application Developer">Application Developer</option>
-                <option value="Game Developer">Game Developer</option>
-            </select>
-        </div>
-        <div>
-            <label>Salary*</label>
-            <input type="number" v-model="employeeSalary">
-        </div>
-        <div>
-            <label>Where will you work from?*</label>
-            <div>
-                <input type="radio" value="Remote" v-model="employeeWork">
-                <span>Remote</span>
+    <div class="employee-form">
+        <h1>Employee Form</h1>
+        <form @submit.prevent="employeeForm" id="employeeForm">
+            <input type="hidden" :value="updateEmpData.id ? updateEmpData.id : 0" id="employeeId">
+            <div class="form-field field-name">
+                <label>Name*</label>
+                <input type="text" v-model="employeeName">
             </div>
-            <div>
-                <input type="radio" value="Hybrid" v-model="employeeWork">
-                <span>Hybrid</span>
+            <div class="form-field field-email">
+                <label>Email*</label>
+                <input type="email" v-model="employeeEmail">
             </div>
-            <div>
-                <input type="radio" value="On-site" v-model="employeeWork">
-                <span>On-site</span>
+            <div class="form-field field-number">
+                <label>Number*</label>
+                <input type="number" v-model="employeeNumber">
             </div>
-        </div>
-        <div>
-            <label>Hobbies*</label>
-            <div>
-                <input type="checkbox" value="Reading" v-model="employeeHobbies">
-                <span>Reading</span>
+            <div class="form-field field-address">
+                <label>Address*</label>
+                <textarea v-model="employeeAddress"></textarea>
             </div>
-            <div>
-                <input type="checkbox" value="Writing" v-model="employeeHobbies">
-                <span>Writing</span>
+            <div class="form-field field-designation">
+                <label>Designation*</label>
+                <select v-model="employeeDesignation">
+                    <option value="">--- Select your designation ---</option>
+                    <option value="Web Developer">Web Developer</option>
+                    <option value="Application Developer">Application Developer</option>
+                    <option value="Game Developer">Game Developer</option>
+                </select>
             </div>
-            <div>
-                <input type="checkbox" value="Traveling" v-model="employeeHobbies">
-                <span>Traveling</span>
+            <div class="form-field field-salary">
+                <label>Salary*</label>
+                <input type="number" v-model="employeeSalary">
             </div>
-        </div>
-        <input type="submit" value="Submit" id="employeeSubmitBtn">
-    </form>
+            <div class="form-field field-work">
+                <label>Where will you work from?*</label>
+                <div class="radio-options">
+                    <input type="radio" value="Remote" v-model="employeeWork">
+                    <span>Remote</span>
+                </div>
+                <div class="radio-options">
+                    <input type="radio" value="Hybrid" v-model="employeeWork">
+                    <span>Hybrid</span>
+                </div>
+                <div class="radio-options">
+                    <input type="radio" value="On-site" v-model="employeeWork">
+                    <span>On-site</span>
+                </div>
+            </div>
+            <div class="form-field field-hobbies">
+                <label>Hobbies*</label>
+                <div class="checkbox-options">
+                    <input type="checkbox" value="Reading" v-model="employeeHobbies">
+                    <span>Reading</span>
+                </div>
+                <div class="checkbox-options">
+                    <input type="checkbox" value="Writing" v-model="employeeHobbies">
+                    <span>Writing</span>
+                </div>
+                <div class="checkbox-options">
+                    <input type="checkbox" value="Traveling" v-model="employeeHobbies">
+                    <span>Traveling</span>
+                </div>
+            </div>
+            <input type="submit" value="Submit" id="employeeSubmitBtn" class="submit-btn">
+        </form>
+    </div>
 
     <br><br>
 
-    <span>Filter </span><input type="text" placeholder="Enter employee any detail"
-        @keyup="(e) => filterEmployeeData(e.target.value)">
+    <span v-show="employeeDatas.length !== 0">Filter </span><input type="text" placeholder="Enter employee any detail"
+        @keyup="(e) => filterEmployeeData(e.target.value)" v-show="employeeDatas.length !== 0">
 
     <br><br>
 
-    <table border="1" v-show="employeeDatas.length !== 0">
+    <table border="1" v-show="employeeDatas.length !== 0" class="employee-data-table">
         <thead>
             <tr>
                 <td>id</td>
@@ -98,9 +99,7 @@
                 <td>{{ value.salary }}</td>
                 <td>{{ value.work }}</td>
                 <td>
-                    <ul>
-                        <li v-for="val in value.hobbies">{{ val }}</li>
-                    </ul>
+                    {{ value.hobbies.join() }}
                 </td>
                 <td><button @click="updateEmployeeData(value)">Update</button> || <button @click="deleteEmployeeData(value.id)">Delete</button></td>
             </tr>
@@ -108,30 +107,26 @@
         </tbody>
     </table>
 
-    <div class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
-        <div class="flex flex-1 justify-between sm:hidden">
-            <a href="#" class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
-            <a href="#" class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
+    <div v-show="employeeDatas.length !== 0">
+        <button @click="prevPage" id="prevBtn">Previous</button>    
+        <div>
+            <p class="text-sm text-gray-700">
+            Showing
+            {{ ' ' }}
+            <span>{{ startData + 1 }}</span>
+            {{ ' ' }}
+            to
+            {{ ' ' }}
+            <span>{{ endData > allEmployeeData.length ? allEmployeeData.length : endData }}</span>
+            {{ ' ' }}
+            of
+            {{ ' ' }}
+            <span>{{ allEmployeeData.length }}</span>
+            {{ ' ' }}
+            results
+            </p>
         </div>
-        <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-            <div>
-                <p class="text-sm text-gray-700">
-                Showing
-                {{ ' ' }}
-                <span class="font-medium">1</span>
-                {{ ' ' }}
-                to
-                {{ ' ' }}
-                <span class="font-medium">{{ employeeDatas.length }}</span>
-                {{ ' ' }}
-                of
-                {{ ' ' }}
-                <span class="font-medium">{{ employeeDatas.length }}</span>
-                {{ ' ' }}
-                results
-                </p>
-            </div>
-        </div>
+        <button @click="nextPage" id="nextBtn">Next</button>
   </div>
 
 </template>
@@ -154,9 +149,40 @@ let employeeDatas = ref([]);
 
 let updateEmpData = ref({});
 
+let pageNumber = 0;
+let startData = 0;
+let endData = 10;
+
+let allEmployeeData = ref([]);
+
 onBeforeMount(async () => {
 
     employeeDatas.value = JSON.parse(await get("employeeData"));
+
+    allEmployeeData.value = JSON.parse(await get("employeeData"));
+
+    if(endData == allEmployeeData.value.length) {
+        
+        document.getElementById("prevBtn").disabled = true;
+        document.getElementById("nextBtn").disabled = true;
+
+    }
+    else if(allEmployeeData.value.length > 0){
+
+        const paginationData = allEmployeeData.value.slice(0, 10);
+
+        employeeDatas.value = paginationData
+
+        document.getElementById("prevBtn").disabled = true;
+
+    }
+    else{
+
+        document.getElementById("prevBtn").disabled = false;
+        document.getElementById("nextBtn").disabled = false;
+
+    }
+
 
 })
 
@@ -183,17 +209,18 @@ const employeeForm = async () => {
             work: employeeWork.value,
             hobbies: updateHobbies
         }
-        employeeDatas.value.push(employeeData);
 
-        await set(JSON.stringify(employeeDatas.value), "employeeData");
+        allEmployeeData.value.push(employeeData);
+
+        await set(JSON.stringify(allEmployeeData.value), "employeeData");
 
     }
-    else {
-
-        const allEmployeeData = JSON.parse(await get("employeeData"));
-
-        const updatedEmployeeData = allEmployeeData.map((value) => value.id == document.getElementById("employeeId").value ? { ...value, name: employeeName.value, email: employeeEmail.value, number: employeeNumber.value, address: employeeAddress.value, designation: employeeDesignation.value, salary: employeeSalary.value, work: employeeWork.value, hobbies: updateHobbies } : value);
-
+    else{
+        
+        allEmployeeData.value = JSON.parse(await get("employeeData"));
+    
+        const updatedEmployeeData = allEmployeeData.value.map((value) => value.id == document.getElementById("employeeId").value ? { ...value, name: employeeName.value, email: employeeEmail.value, number: employeeNumber.value, address: employeeAddress.value, designation: employeeDesignation.value, salary: employeeSalary.value, work: employeeWork.value, hobbies: updateHobbies } : value);
+    
         await set(JSON.stringify(updatedEmployeeData), "employeeData")
 
     }
@@ -207,9 +234,9 @@ const employeeForm = async () => {
 
 const deleteEmployeeData = async (id) => {
 
-    const allEmployeeDatas = JSON.parse(await get("employeeData"));
+    allEmployeeData.value = JSON.parse(await get("employeeData"));
 
-    const filterEmployeeDatas = allEmployeeDatas.filter((value, index) => value.id !== id);
+    const filterEmployeeDatas = allEmployeeData.value.filter((value, index) => value.id !== id);
 
     await set(JSON.stringify(filterEmployeeDatas), "employeeData");
 
@@ -236,13 +263,18 @@ const updateEmployeeData = async (data) => {
 
 const filterEmployeeData = async (data) => {
 
-    const allEmployeeData = JSON.parse(await get("employeeData"));
+    allEmployeeData.value = JSON.parse(await get("employeeData"));
 
-    const filterEmployeeData = allEmployeeData.filter((value) => value.id == data || value.name == data || value.email == data || value.number == data || value.address == data || value.designation == data || value.salary == data || value.work == data);
+    const filterEmployeeData = allEmployeeData.value.filter((value) => value.id == data || value.name == data || value.email == data || value.number == data || value.address == data || value.designation == data || value.salary == data || value.work == data);
 
-    if (filterEmployeeData.length == 0) {
+    if (filterEmployeeData.length == 0 || data.length == 0) {
 
-        employeeDatas.value = allEmployeeData
+        const paginationData = allEmployeeData.value.slice(0, 10);
+
+        employeeDatas.value = paginationData
+
+        startData = 0;
+        endData = 10;
 
     }
     else {
@@ -250,6 +282,64 @@ const filterEmployeeData = async (data) => {
         employeeDatas.value = filterEmployeeData
 
     }
+
+}
+
+const prevPage = async () => {
+
+    allEmployeeData.value = JSON.parse(await get("employeeData"));
+
+    pageNumber--;
+
+    startData = pageNumber * 10;
+    endData = startData + 10;
+
+    if(pageNumber <= 0){
+
+        document.getElementById("prevBtn").disabled = true;
+        document.getElementById("nextBtn").disabled = false;
+
+        const paginationData = allEmployeeData.value.slice(0, 10);
+
+        employeeDatas.value = paginationData
+
+    }
+    else{
+
+        const paginationData = allEmployeeData.value.slice(startData, endData);
+
+        employeeDatas.value = paginationData
+
+    }
+}
+
+const nextPage = async () => {
+
+    allEmployeeData.value = JSON.parse(await get("employeeData"));
+
+    pageNumber++;
+
+    startData = pageNumber * 10;
+    endData = startData + 10;
+
+    if(endData > allEmployeeData.value.length){
+
+        document.getElementById("nextBtn").disabled = true;
+
+        const paginationData = allEmployeeData.value.slice(startData, endData);
+
+        employeeDatas.value = paginationData
+        
+    }
+    else{
+        
+        const paginationData = allEmployeeData.value.slice(startData, endData);
+    
+        employeeDatas.value = paginationData
+
+    }
+
+    document.getElementById("prevBtn").disabled = false;
 
 }
 
