@@ -9,6 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@formkit/addons": "^1.4.0",
+    "@formkit/themes": "^1.4.0",
+    "@formkit/vue": "^1.4.0",
+    "@headlessui/vue": "^1.7.16",
     "@heroicons/vue": "^2.0.18",
     "idb": "^8.0.0",
     "vue": "^3.3.10"

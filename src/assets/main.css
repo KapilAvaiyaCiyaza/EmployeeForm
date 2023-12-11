@@ -1,16 +1,8 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+
 *{ margin: 0; padding: 0; box-sizing: border-box; outline: none; }
 
-.employee-form { width: 800px; margin: 30px auto 0; padding: 30px; border-radius: 10px; background-color: cadetblue; }
+.employee-form { width: 470px; margin: 30px auto 0; padding: 30px; border-radius: 10px; background-color: #f9fafb; }
 .employee-form h1 { text-align: center; margin-bottom: 30px; }
-.employee-form form { display: flex; flex-wrap: wrap; align-items: first baseline; justify-content: space-between; }
-.employee-form form .form-field { margin-bottom: 15px; width: calc(50% - 30px); }
-.employee-form form .form-field label { display: block; margin-bottom: 5px; }
-.employee-form form .form-field input, .employee-form form .form-field select { display: block; width: 100%; height: 35px; padding: 5px 15px; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 5px; }
-.employee-form form .form-field textarea { display: block; width: 100%; height: 100px; padding: 5px 15px; border: 1px solid rgba(0, 0, 0, 0.5); border-radius: 5px; }
-
-.employee-form form .field-work, .employee-form form .field-hobbies { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; }
-.employee-form form .field-work label, .employee-form form .field-hobbies label { display: block; width: 100%; }
-.employee-form form .field-work .radio-options, .employee-form form .field-hobbies .checkbox-options { width: 33.33%; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; }
-.employee-form form .field-work .radio-options input, .employee-form form .field-hobbies .checkbox-options input { width: auto; margin-right: 5px; }
-
-.employee-form form .submit-btn { display: block; width: 50%; margin: 0 auto; height: 40px; border: none; border-radius: 100px; }
+.employee-form .formkit-form .formkit-outer .formkit-wrapper, .employee-form .formkit-form .formkit-outer .formkit-fieldset { margin: 0 auto; }
+.employee-form .formkit-form .formkit-actions .formkit-outer .formkit-wrapper { text-align: center; }
