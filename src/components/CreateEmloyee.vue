@@ -2,7 +2,7 @@
     <div class="employee-form">
         <h1 class="text-3xl font-bold">Employee Form</h1>
         <FormKit type="form" submit-label="Submit" @submit="$emit('employeeForm', newModel)" v-model="newModel">
-            <FormKit type="text" name="id" :value="newModel.id ? newModel.id : 0" id="employeeId" />
+            <FormKit type="hidden" name="id" :value="newModel.id ? newModel.id : 0" id="employeeId" />
             <FormKit type="text" label="Name" name="name" validation="required" />
             <FormKit type="email" label="Email" name="email" validation="required|email|ends_with:.com" validation-visibility="blur" />
             <FormKit type="tel" label="Number" name="number" validation="matches:/^[0-9]{10}$/" :validation-messages="{matches: 'Phone number must be 10 digit'}" />
@@ -17,21 +17,14 @@
 
 <script setup>
 
-import { onBeforeUpdate, onUpdated, ref } from 'vue';
+import { onBeforeUpdate, ref } from 'vue';
 
 let newModel = ref({});
 
 const props = defineProps(['updateEmpData'])
 
-onUpdated(() => {
-    console.log(props.updateEmpData);
-    // const data = JSON.parse(JSON.stringify(props.updateEmpData));
-
-    // console.log(data);
+onBeforeUpdate(() => {
+    newModel = props.updateEmpData
 })
-
-// onBeforeUpdate(() => {
-//     console.log(props.updateEmpData);
-// })
 
 </script>
