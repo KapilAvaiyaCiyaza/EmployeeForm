@@ -1,25 +1,28 @@
 <template>
-    <div class="employee-form">
+    <CreateEmployee @employee-form="employeeForm" :updateEmpData="newModel" />
+    <!-- <div class="employee-form">
         <h1 class="text-3xl font-bold">Employee Form</h1>
         <FormKit type="form" submit-label="Submit" @submit="employeeForm" v-model="newModel">
             <FormKit type="hidden" name="id" :value="newModel.id ? newModel.id : 0" id="employeeId" />
             <FormKit type="text" label="Name" name="name" validation="required" />
             <FormKit type="email" label="Email" name="email" validation="required|email|ends_with:.com" validation-visibility="blur" />
-            <FormKit type="number" label="Number" name="number" validation="required" />
-            <FormKit type="textarea" label="Address" name="address" validation="required" />
+            <FormKit type="tel" label="Number" name="number" validation="matches:/^[0-9]{10}$/" :validation-messages="{matches: 'Phone number must be 10 digit'}" />
+            <FormKit type="textarea" label="Address" name="address" validation="required" auto-height />
             <FormKit type="select" label="Designation" name="designation" :options="[{label:'--- Select your designation ---', value:'--- Select your designation ---', attrs: { disabled: true }}, 'Web Developer', 'Application Developer', 'Game Developer']" validation="required" />
             <FormKit type="number" label="Salary" name="salary" validation="required" />
             <FormKit type="radio" label="Where will you work from?" name="work" :options="['Remote', 'Hybrid', 'On-site']" />
             <FormKit type="checkbox" label="Hobbies" name="hobbies" :options="['Reading', 'Writing', 'Traveling']" validation="required|min:1" />
         </FormKit>
-    </div>
+    </div> -->
 
     <div class="flex flex-wrap items-center justify-center mt-20 mb-10">
         <span v-show="employeeDatas.length !== 0" class="me-2 text-sm font-medium text-gray-900 dark:text-white">Filter </span><input type="text" placeholder="Enter employee any detail"
             @keyup="(e) => filterEmployeeData(e.target.value)" v-show="employeeDatas.length !== 0" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 w-48">
     </div>
 
-    <div class="relative shadow-md sm:rounded-lg mx-10">
+    <EmployeeData :empPaginateData="paginationData" @update-employee-data="updateEmployeeData" />
+    
+    <!-- <div class="relative shadow-md sm:rounded-lg mx-10">
         <table border="1" v-show="employeeDatas.length !== 0" class="employee-data-table w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
@@ -53,9 +56,11 @@
                 <tr v-else>No record found</tr>
             </tbody>
         </table>
-    </div>
+    </div> -->
 
-    <div v-show="employeeDatas.length !== 0" class="flex flex-wrap items-center justify-center mt-5 mb-10">
+    <EmployeeDataPagination @prev-page="prevPage" @next-page="nextPage" :empPaginateNumber="{startNumber: startData, endNumber: endData}" />
+
+    <!-- <div v-show="employeeDatas.length !== 0" class="flex flex-wrap items-center justify-center mt-5 mb-10">
         <button @click="prevPage" id="prevBtn" class="flex items-center justify-center px-3 me-3 h-8 text-sm font-medium text-white bg-gray-800 rounded hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
             <svg class="w-3.5 h-3.5 me-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
@@ -83,7 +88,7 @@
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
             </svg>
         </button>
-  </div>
+  </div> -->
 
 </template>
 
@@ -91,10 +96,16 @@
 
 import { onBeforeMount, ref } from 'vue';
 import { set, get } from './EmployeeIdb.vue';
+import CreateEmployee from "./CreateEmloyee.vue";
+import EmployeeData from "./EmployeeData.vue";
+import EmployeeDataPagination from "./EmployeeDataPagination.vue";
 
 let newModel = ref({});
 
 let employeeDatas = ref([]);
+let allEmployeeData = ref([]);
+
+let paginationData = ref([]);
 
 let updateEmpData = ref({});
 
@@ -102,60 +113,35 @@ let pageNumber = 0;
 let startData = 0;
 let endData = 10;
 
-let allEmployeeData = ref([]);
-
 onBeforeMount(async () => {
 
     employeeDatas.value = JSON.parse(await get("employeeData"));
 
     allEmployeeData.value = JSON.parse(await get("employeeData"));
 
-    if(endData == allEmployeeData.value.length) {
-        
-        document.getElementById("prevBtn").disabled = true;
-        document.getElementById("nextBtn").disabled = true;
-
-    }
-    else if(allEmployeeData.value.length > 0){
-
-        const paginationData = allEmployeeData.value.slice(0, 10);
-
-        employeeDatas.value = paginationData
-
-        document.getElementById("prevBtn").disabled = true;
-
-    }
-    else{
-
-        document.getElementById("prevBtn").disabled = false;
-        document.getElementById("nextBtn").disabled = false;
-
-    }
-
-
 })
 
-const employeeForm = async () => {
+const employeeForm = async (data) => {
 
     const employeeId = document.getElementById("employeeId").value;
 
     const updateHobbies = [];
 
-    for (const item in newModel.value.hobbies) {
-        updateHobbies.push(newModel.value.hobbies[item])
+    for (const item in data.hobbies) {
+        updateHobbies.push(data.hobbies[item])
     }
 
     if (employeeId == 0) {
 
         const employeeData = {
             id: Math.floor(Math.random() * 9999),
-            name: newModel.value.name,
-            email: newModel.value.email,
-            number: newModel.value.number,
-            address: newModel.value.address,
-            designation: newModel.value.designation,
-            salary: newModel.value.salary,
-            work: newModel.value.work,
+            name: data.name,
+            email: data.email,
+            number: data.number,
+            address: data.address,
+            designation: data.designation,
+            salary: data.salary,
+            work: data.work,
             hobbies: updateHobbies
         }
 
@@ -197,19 +183,19 @@ const deleteEmployeeData = async (id) => {
 
 const updateEmployeeData = async (data) => {
 
-    updateEmpData.value = await JSON.parse(JSON.stringify(data));
+    const employeeData = await JSON.parse(JSON.stringify(data));
 
-    newModel.value.id = updateEmpData.value.id;
-    newModel.value.name = updateEmpData.value.name;
-    newModel.value.email = updateEmpData.value.email;
-    newModel.value.number = updateEmpData.value.number;
-    newModel.value.address = updateEmpData.value.address;
-    newModel.value.designation = updateEmpData.value.designation;
-    newModel.value.salary = updateEmpData.value.salary;
-    newModel.value.work = updateEmpData.value.work;
-    newModel.value.hobbies = updateEmpData.value.hobbies;
+    newModel.value.id = employeeData.id;
+    newModel.value.name = employeeData.name;
+    newModel.value.email = employeeData.email;
+    newModel.value.number = employeeData.number;
+    newModel.value.address = employeeData.address;
+    newModel.value.designation = employeeData.designation;
+    newModel.value.salary = employeeData.salary;
+    newModel.value.work = employeeData.work;
+    newModel.value.hobbies = employeeData.hobbies;
 
-    document.getElementById("input_9").innerText = "Update Data"
+    document.getElementById("input_9").innerText = "Update Data";
 
 }
 
@@ -251,18 +237,19 @@ const prevPage = async () => {
         document.getElementById("prevBtn").disabled = true;
         document.getElementById("nextBtn").disabled = false;
 
-        const paginationData = allEmployeeData.value.slice(0, 10);
+        const paginaData = allEmployeeData.value.slice(0, 10);
 
-        employeeDatas.value = paginationData
+        paginationData.value = paginaData
 
     }
     else{
 
-        const paginationData = allEmployeeData.value.slice(startData, endData);
+        const paginaData = allEmployeeData.value.slice(startData, endData);
 
-        employeeDatas.value = paginationData
+        paginationData.value = paginaData
 
     }
+
 }
 
 const nextPage = async () => {
@@ -278,16 +265,16 @@ const nextPage = async () => {
 
         document.getElementById("nextBtn").disabled = true;
 
-        const paginationData = allEmployeeData.value.slice(startData, endData);
+        const paginaData = allEmployeeData.value.slice(startData, endData);
 
-        employeeDatas.value = paginationData
+        paginationData.value = paginaData
         
     }
     else{
         
-        const paginationData = allEmployeeData.value.slice(startData, endData);
+        const paginaData = allEmployeeData.value.slice(startData, endData);
     
-        employeeDatas.value = paginationData
+        paginationData.value = paginaData
 
     }
 
