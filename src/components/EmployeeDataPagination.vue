@@ -31,7 +31,6 @@
 </template>
 
 <script setup>
-
 import { onBeforeMount, onBeforeUpdate, ref } from 'vue';
 import { get } from './EmployeeIdb.vue';
 
@@ -43,19 +42,13 @@ let endData = 10;
 
 const props = defineProps(['empPaginateNumber']);
 
-onBeforeUpdate(() => {
+onBeforeMount(async () => {    
+    employeeDatas.value = JSON.parse(await get("employeeData"));
+    allEmployeeData.value = JSON.parse(await get("employeeData"));
+})
 
+onBeforeUpdate(() => {
     startData = props.empPaginateNumber.startNumber;
     endData = props.empPaginateNumber.endNumber;
-
 })
-
-onBeforeMount(async () => {
-
-    employeeDatas.value = JSON.parse(await get("employeeData"));
-
-    allEmployeeData.value = JSON.parse(await get("employeeData"));
-
-})
-
 </script>

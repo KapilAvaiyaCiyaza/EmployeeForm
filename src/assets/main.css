@@ -2,7 +2,7 @@
 
 *{ margin: 0; padding: 0; box-sizing: border-box; outline: none; }
 
-.employee-form { width: 470px; margin: 30px auto 0; padding: 30px; border-radius: 10px; background-color: #f9fafb; }
+.employee-form { width: 470px; margin: 30px auto 30px; padding: 30px; border-radius: 10px; background-color: #f9fafb; }
 .employee-form h1 { text-align: center; margin-bottom: 30px; }
 .employee-form .formkit-form .formkit-outer .formkit-wrapper, .employee-form .formkit-form .formkit-outer .formkit-fieldset { margin: 0 auto; }
 .employee-form .formkit-form .formkit-actions .formkit-outer .formkit-wrapper { text-align: center; }
