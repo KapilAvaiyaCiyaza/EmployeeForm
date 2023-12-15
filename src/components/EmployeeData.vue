@@ -76,18 +76,19 @@ import employeeStore from "../store"
 
 let employeeDatas = ref([]);
 let allEmployeeData = ref([]);
+let filterData = ref([]);
 
 const open = ref(false)
 const employeeId = ref("");
 
-const props = defineProps(['empPaginateData','filterEmpData']);
+const props = defineProps(['empPaginateData', 'filterEmpData', 'filterShowData']);
 
 onBeforeMount(async () => {
 
     const allData = await employeeStore.getEmployeeData();
 
     allEmployeeData.value = await JSON.parse(allData);
-    employeeDatas.value = allEmployeeData.value;
+    employeeDatas.value = await JSON.parse(allData);
 
     if(10 == allEmployeeData.value.length) {
         
@@ -113,30 +114,40 @@ onBeforeMount(async () => {
 
 })
 
-onBeforeUpdate(() => {
+onBeforeUpdate(async () => {
 
-    const paginationData = JSON.parse(JSON.stringify(props.empPaginateData))
-    const filterData = JSON.parse(JSON.stringify(props.filterEmpData));
-    
-    if(filterData.length !== 0){
+    const paginationData = await props.empPaginateData.paginateData;
+    const startNumber = await props.empPaginateData.startNumber;
+    const endNumber = await props.empPaginateData.endNumber;
+
+    filterData.value = props.filterEmpData;
         
-        employeeDatas.value = filterData
-
+    if(filterData.value.length !== 0){
+        
+        employeeDatas.value = filterData.value
+        document.getElementById("nextBtn").disabled = true;
+        
     }
-    else if(paginationData.length <= 0){
+    else if(paginationData.length >= endNumber){
+        
+        employeeDatas.value = paginationData;
 
-        const paginateData = allEmployeeData.value.slice(0, 10);
+        if(startNumber == 0){
 
-        employeeDatas.value = paginateData
-
-        document.getElementById("prevBtn").disabled = true;
-
+            document.getElementById("prevBtn").disabled = true;
+            document.getElementById("nextBtn").disabled = false;
+            
+        }
+        else{
+            document.getElementById("prevBtn").disabled = false;
+        }
+        
     }
     else{
         
-        const paginateData = JSON.parse(JSON.stringify(props.empPaginateData));
-        
-        employeeDatas.value = paginateData;
+        employeeDatas.value = paginationData;
+
+        document.getElementById("nextBtn").disabled = true;;
 
     }
 

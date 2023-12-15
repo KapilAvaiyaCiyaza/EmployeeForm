@@ -1,7 +1,7 @@
 <template>
-    <FilterEmployeeData @filter-employee-data="filterEmployeeData"/>
-    <EmployeeData :empPaginateData="paginationData" :filterEmpData="filterData" />
-    <EmployeeDataPagination @prev-page="prevPage" @nextPage="nextPage" />
+    <FilterEmployeeData @filter-employee-data="filterEmployeeData" />
+    <EmployeeData :empPaginateData="paginationData" :filterEmpData="filterData" :filterShowData="filterShowData" />
+    <EmployeeDataPagination @prev-page="prevPage" @nextPage="nextPage" :empPaginateData="paginationData" />
 </template>
 
 <script setup>
@@ -11,16 +11,13 @@ import EmployeeData from "./EmployeeData.vue";
 import EmployeeDataPagination from "./EmployeeDataPagination.vue";
 import FilterEmployeeData from "./FilterEmployeeData.vue";
 
-let newModel = ref({});
 let employeeDatas = ref([]);
 let allEmployeeData = ref([]);
-let paginationData = ref([]);
+let paginationData = ref({});
 let filterData = ref([]);
 let showForm = ref(false);
+let filterShowData = ref(false)
 
-let pageNumber = 0;
-let startData = 0;
-let endData = 10;
 
 onBeforeMount(async () => {
 
@@ -53,35 +50,23 @@ onBeforeMount(async () => {
 
 const filterEmployeeData = async (data) => {
 
-    allEmployeeData.value = JSON.parse(await get("employeeData"));
-
-    const filterEmployeeData = allEmployeeData.value.filter((value) => value.id == data || value.name == data || value.email == data || value.number == data || value.address == data || value.designation == data || value.salary == data || value.work == data);
-
-    if (filterEmployeeData.length == 0 || data.length == 0) {
-
-        filterData.value = []
-
-        startData = 0;
-        endData = 10;
-
-    }
-    else {
-
-        filterData.value = filterEmployeeData
-
-    }
+    filterData.value = await data;
 
 }
 
 const prevPage = async (data) => {
 
-    console.log(await data);
+    const paginateData = await data;
+
+    paginationData.value = paginateData;
 
 }
 
 const nextPage = async (data) => {
 
-    console.log(await data);
+    const paginateData = await data;
+
+    paginationData.value = paginateData;
 
 }
 </script>

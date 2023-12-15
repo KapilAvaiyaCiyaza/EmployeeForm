@@ -14,10 +14,13 @@ const employeeStore = reactive({
         return await get("employeeData");
     },
     async deleteEmployeeData(id){
-
         const employeeData = JSON.parse(await get("employeeData"));
 
         const filterEmployeeDatas = employeeData.filter((value, index) => value.id !== id);
+
+        pageNumber = 0;
+        startNumber = 0;
+        endNumber = 10;
 
         await set(JSON.stringify(filterEmployeeDatas), "employeeData");
 
@@ -31,25 +34,20 @@ const employeeStore = reactive({
         endNumber = startNumber + 10;
 
         if(pageNumber <= 0){
-
-            document.getElementById("prevBtn").disabled = true;
-            document.getElementById("nextBtn").disabled = false;
+            const paginateData = employeeData.slice(startNumber, endNumber);
     
-            const paginaData = employeeData.slice(0, 10);
-    
-            return paginaData
-    
+            return {paginateData, startNumber, endNumber}
         }
         else{
-    
-            const paginaData = employeeData.slice(startNumber, endNumber);
-    
-            return paginaData;
-    
+
+            const paginateData = employeeData.slice(startNumber, endNumber);
+            
+            document.getElementById("prevBtn").disabled = false;
+
+            return {paginateData, startNumber, endNumber};
         }
     },
     async paginationPrevPage(){
-
         const employeeData = JSON.parse(await get("employeeData"));
         pageNumber--;
 
@@ -57,23 +55,36 @@ const employeeStore = reactive({
         endNumber = startNumber + 10;
 
         if(endNumber > employeeData.length || endNumber == employeeData.length){
-
-            document.getElementById("nextBtn").disabled = true;
     
-            const paginaData = employeeData.slice(startNumber, endNumber);
+            const paginateData = employeeData.slice(startNumber, endNumber);
     
-            return paginaData;
+            return {paginateData, startNumber, endNumber};
             
         }
         else{
             
-            const paginaData = employeeData.slice(startNumber, endNumber);
+            const paginateData = employeeData.slice(startNumber, endNumber);
         
-            return paginaData;
+            return {paginateData, startNumber, endNumber};
     
         }
+    },
+    async filterEmployeeData(name) {
+
+        const employeeData = JSON.parse(await get("employeeData"));
+
+        const filterEmployeeData = employeeData.filter((value) => value.id == name || value.name == name || value.email == name || value.number == name || value.address == name || value.designation == name || value.salary == name || value.work == name);
+
+        if (filterEmployeeData.length == 0 || name.length == 0) {
+            
+            return undefined;
+            
+        }
+        else {
+            
+            return await filterEmployeeData;
     
-        document.getElementById("prevBtn").disabled = false;
+        }
 
     }
 })
