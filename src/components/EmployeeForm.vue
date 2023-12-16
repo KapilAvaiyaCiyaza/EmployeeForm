@@ -1,6 +1,6 @@
 <template>
     <FilterEmployeeData @filter-employee-data="filterEmployeeData" />
-    <EmployeeData :empPaginateData="paginationData" :filterEmpData="filterData" :filterShowData="filterShowData" />
+    <EmployeeData :empPaginateData="paginationData" :filterEmpData="filterData" />
     <EmployeeDataPagination @prev-page="prevPage" @nextPage="nextPage" :empPaginateData="paginationData" />
 </template>
 
@@ -10,13 +10,13 @@ import { get } from './EmployeeIdb.vue';
 import EmployeeData from "./EmployeeData.vue";
 import EmployeeDataPagination from "./EmployeeDataPagination.vue";
 import FilterEmployeeData from "./FilterEmployeeData.vue";
+import employeeStore from "../store"
 
 let employeeDatas = ref([]);
 let allEmployeeData = ref([]);
 let paginationData = ref({});
 let filterData = ref([]);
 let showForm = ref(false);
-let filterShowData = ref(false)
 
 
 onBeforeMount(async () => {
@@ -50,7 +50,9 @@ onBeforeMount(async () => {
 
 const filterEmployeeData = async (data) => {
 
-    filterData.value = await data;
+    const filterempData = await employeeStore.filterEmployeeData(data);
+
+    filterData.value = await filterempData;
 
 }
 

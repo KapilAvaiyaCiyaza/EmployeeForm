@@ -77,12 +77,12 @@ const employeeStore = reactive({
 
         if (filterEmployeeData.length == 0 || name.length == 0) {
             
-            return undefined;
+            return [];
             
         }
         else {
             
-            return await filterEmployeeData;
+            return filterEmployeeData;
     
         }
 
