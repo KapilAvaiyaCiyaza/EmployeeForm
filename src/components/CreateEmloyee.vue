@@ -1,7 +1,7 @@
 <template>
     <div class="employee-form">
         <h1 class="text-3xl font-bold">Employee Form</h1>
-        <FormKit type="form" :submit-label="updateEmployeeId != 0 ? 'Submit' : 'Update Data'" @submit="employeeForm(newModel)" v-model="newModel">
+        <FormKit type="form" :submit-label="updateEmployeeId != 0 ? 'Update Data' : 'Submit'" @submit="employeeForm(newModel)" v-model="newModel">
             <FormKit type="hidden" name="id" :value="newModel.id ? newModel.id : 0" id="employeeId" />
             <FormKit type="text" label="Name" name="name" validation="required" />
             <FormKit type="email" label="Email" name="email" validation="required|email|ends_with:.com" validation-visibility="blur" />

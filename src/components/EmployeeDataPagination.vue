@@ -9,11 +9,11 @@
             <p class="text-sm text-gray-700 dark:text-gray-400">
             Showing
             {{ ' ' }}
-            <span class="font-semibold text-gray-900 dark:text-white">{{ startData + 1 }}</span>
+            <span class="font-semibold text-gray-900 dark:text-white">{{ startNumber + 1 }}</span>
             {{ ' ' }}
             to
             {{ ' ' }}
-            <span class="font-semibold text-gray-900 dark:text-white">{{ endData > allEmployeeData.length ? allEmployeeData.length : endData }}</span>
+            <span class="font-semibold text-gray-900 dark:text-white">{{ endNumber > allEmployeeData.length ? allEmployeeData.length : endNumber }}</span>
             {{ ' ' }}
             of
             {{ ' ' }}
@@ -31,18 +31,32 @@
 </template>
 
 <script setup>
-import { onBeforeMount, ref } from 'vue';
+import { onBeforeMount, onBeforeUpdate, ref } from 'vue';
 import { get } from './EmployeeIdb.vue';
 import employeeStore from "../store"
 
 let employeeDatas = ref([]);
 let allEmployeeData = ref([]);
 
-let startData = 0;
-let endData = 10;
+let startNumber = 0;
+let endNumber = 10;
+
+const props = defineProps(['empPaginateData']);
 
 onBeforeMount(async () => {    
     employeeDatas.value = JSON.parse(await get("employeeData"));
     allEmployeeData.value = JSON.parse(await get("employeeData"));
+})
+
+onBeforeUpdate(() => {
+
+    startNumber = props.empPaginateData.startNumber;
+    endNumber = props.empPaginateData.endNumber;
+
+    if(startNumber == undefined || endNumber == undefined){
+        startNumber = 0;
+        endNumber = 10;
+    }
+
 })
 </script>
