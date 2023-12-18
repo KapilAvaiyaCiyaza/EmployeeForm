@@ -8,6 +8,9 @@ let endNumber = 0;
 
 const employeeStore = reactive({
     async setEmployeeData(data){
+        pageNumber = 0;
+        startNumber = 0;
+        endNumber = 10;
         await set(JSON.stringify(data), "employeeData");
     },
     async getEmployeeData(){

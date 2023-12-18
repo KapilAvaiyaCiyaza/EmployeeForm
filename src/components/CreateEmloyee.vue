@@ -20,7 +20,7 @@ import { onBeforeMount, ref } from 'vue';
 import { get } from './EmployeeIdb.vue';
 import employeeStore from "../store"
 import router from '@/routes';
-import { useRoute } from 'vue-router'
+import { onBeforeRouteLeave, useRoute } from 'vue-router'
 
 let newModel = ref({});
 let allEmployeeData = ref([]);
@@ -42,6 +42,16 @@ onBeforeMount(async () => {
     const oldEmployeeData = employeeData.filter((value) => value.id == updateEmployeeId.value.params.id)
 
     newModel.value = oldEmployeeData[0];
+})
+
+onBeforeRouteLeave((to, from) => {
+
+    if(to.path == "/createemployee"){
+        newModel.value = {};
+        document.getElementById("employeeId").value = 0;
+        updateEmployeeId.value = 0
+    }
+
 })
 
 const employeeForm = async (data) => {
