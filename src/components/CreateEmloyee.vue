@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { onBeforeMount, onUpdated, ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import { get } from './EmployeeIdb.vue';
 import employeeStore from "../store"
 import router from '@/routes';
@@ -28,7 +28,7 @@ let allEmployeeData = ref([]);
 const route = useRoute();
 
 let employeeData = [];
-let updateEmployeeId = 0;
+let updateEmployeeId = ref("");
 
 onBeforeMount(async () => {
 
@@ -37,12 +37,11 @@ onBeforeMount(async () => {
 
     employeeData = JSON.parse(JSON.stringify(allEmployeeData.value));
 
-    updateEmployeeId = route;
+    updateEmployeeId.value = route;
 
-    const oldEmployeeData = employeeData.filter((value) => value.id == updateEmployeeId.params.id)
+    const oldEmployeeData = employeeData.filter((value) => value.id == updateEmployeeId.value.params.id)
 
     newModel.value = oldEmployeeData[0];
-    
 })
 
 const employeeForm = async (data) => {
@@ -86,7 +85,7 @@ const employeeForm = async (data) => {
 
     document.getElementById("employeeId").value = 0;
 
-    router.push("/employeelist")
+    router.push("/employeelist");
 
 }
 

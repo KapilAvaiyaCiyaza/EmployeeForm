@@ -81,7 +81,7 @@ let filterData = ref([]);
 const open = ref(false)
 const employeeId = ref("");
 
-const props = defineProps(['empPaginateData', 'filterEmpData', 'filterShowData']);
+const props = defineProps(['empPaginateData', 'filterEmpData']);
 
 onBeforeMount(async () => {
 
@@ -120,7 +120,7 @@ onBeforeUpdate(async () => {
     const startNumber = await props.empPaginateData.startNumber;
     const endNumber = await props.empPaginateData.endNumber;
 
-    filterData.value = props.filterEmpData;
+    filterData.value = await props.filterEmpData;
         
     if(filterData.value.length !== 0){
         
