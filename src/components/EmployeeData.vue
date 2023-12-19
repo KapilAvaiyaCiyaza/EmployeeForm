@@ -3,15 +3,15 @@
         <table border="1" v-show="employeeDatas.length !== 0" class="employee-data-table w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                    <th scope="col" class="px-6 py-3">id</th>
-                    <th scope="col" class="px-6 py-3">Name</th>
-                    <th scope="col" class="px-6 py-3">Email</th>
-                    <th scope="col" class="px-6 py-3">Number</th>
-                    <th scope="col" class="px-6 py-3">Address</th>
-                    <th scope="col" class="px-6 py-3">Designation</th>
-                    <th scope="col" class="px-6 py-3">Salary</th>
-                    <th scope="col" class="px-6 py-3">Work</th>
-                    <th scope="col" class="px-6 py-3">Hobbies</th>
+                    <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">id <span class=" ms-1" style="cursor: pointer;" @click="sortByEmpData('id')"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
+                    <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">Name <span class=" ms-1" style="cursor: pointer;" @click="sortByEmpData('name')"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
+                    <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">Email <span class=" ms-1" style="cursor: pointer;" @click="sortByEmpData('email')"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
+                    <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">Number <span class=" ms-1" style="cursor: pointer;" @click="sortByEmpData('number')"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
+                    <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">Address <span class=" ms-1" style="cursor: pointer;" @click="sortByEmpData('address')"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
+                    <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">Designation <span class=" ms-1" style="cursor: pointer;" @click="sortByEmpData('designation')"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
+                    <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">Salary <span class=" ms-1" style="cursor: pointer;" @click="sortByEmpData('salary')"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
+                    <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">Work <span class=" ms-1" style="cursor: pointer;" @click="sortByEmpData('work')"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
+                    <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">Hobbies <span class=" ms-1" style="cursor: pointer;"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
                     <th scope="col" class="px-6 py-3">Actions</th>
                 </tr>
             </thead>
@@ -71,13 +71,14 @@
 <script setup>
 import { onBeforeMount, onBeforeUpdate, ref } from 'vue';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
+import { ExclamationTriangleIcon, ArrowsUpDownIcon } from '@heroicons/vue/24/outline'
 import employeeStore from "../store"
 
 let employeeDatas = ref([]);
 let allEmployeeData = ref([]);
 let filterData = ref([]);
 let paginateEmpData = ref([]);
+let sortData = ref([]);
 
 const open = ref(false)
 const employeeId = ref("");
@@ -91,13 +92,7 @@ onBeforeMount(async () => {
     allEmployeeData.value = await JSON.parse(allData);
     employeeDatas.value = await JSON.parse(allData);
 
-    if(10 == allEmployeeData.value.length) {
-        
-        document.getElementById("prevBtn").disabled = true;
-        document.getElementById("nextBtn").disabled = true;
-
-    }
-    else if(allEmployeeData.value.length > 0){
+    if(allEmployeeData.value.length > 0){
         
         paginateEmpData.value = allEmployeeData.value.slice(0, 10);
         
@@ -105,6 +100,12 @@ onBeforeMount(async () => {
         
         document.getElementById("prevBtn").disabled = true;
         
+    }
+    else if(10 == allEmployeeData.value.length) {
+        
+        document.getElementById("prevBtn").disabled = true;
+        document.getElementById("nextBtn").disabled = true;
+
     }
     else{
 
@@ -127,30 +128,37 @@ onBeforeUpdate(async () => {
         
         employeeDatas.value = filterData.value
         document.getElementById("nextBtn").disabled = true;
-        
+
+        sortData.value = [];
+
     }
     else if(allEmployeeData.value.length >= endNumber){
         
         employeeDatas.value = paginationData;
 
         if(startNumber == 0){
-
             document.getElementById("prevBtn").disabled = true;
-            document.getElementById("nextBtn").disabled = false;
-            
+            document.getElementById("nextBtn").disabled = false;   
         }
         else{
             document.getElementById("prevBtn").disabled = false;
         }
+
         
     }
-    else{
+    else if(sortData.value.length > 0){
         
+        allEmployeeData.value = sortData.value;
+
+    }
+    else{   
+
+        sortData.value = []
+
         if(paginationData == undefined){
             employeeDatas.value = paginateEmpData.value
         }
         else{
-            console.log(endNumber);
             employeeDatas.value = paginationData;
         }
         
@@ -163,4 +171,39 @@ onBeforeUpdate(async () => {
     }
 
 })
+
+const sortByEmpData = async (name) => {
+
+    const empData = await JSON.parse(JSON.stringify(allEmployeeData.value));
+    let sortEmpData = [];
+    
+    if(name == "id"){
+        sortEmpData = await employeeStore.sortEmployeeData.sortById(empData);
+    }
+    else if(name == "name"){
+        sortEmpData = await employeeStore.sortEmployeeData.sortByName(empData);
+    }
+    else if(name == "email"){
+        sortEmpData = await employeeStore.sortEmployeeData.sortByEmail(empData);
+    }
+    else if(name == "number"){
+        sortEmpData = await employeeStore.sortEmployeeData.sortByNumber(empData);
+    }
+    else if(name == "address"){
+        sortEmpData = await employeeStore.sortEmployeeData.sortByAddress(empData);
+    }
+    else if(name == "designation"){
+        sortEmpData = await employeeStore.sortEmployeeData.sortByDesignation(empData);
+    }
+    else if(name == "salary"){
+        sortEmpData = await employeeStore.sortEmployeeData.sortBySalary(empData);
+    }
+    else if(name == "work"){
+        sortEmpData = await employeeStore.sortEmployeeData.sortByWork(empData);
+    }
+
+    sortData.value = await sortEmpData;
+    employeeDatas.value = sortEmpData.slice(0, 10);
+    allEmployeeData.value = sortEmpData;
+}
 </script>
