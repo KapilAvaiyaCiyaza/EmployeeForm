@@ -77,6 +77,7 @@ import employeeStore from "../store"
 let employeeDatas = ref([]);
 let allEmployeeData = ref([]);
 let filterData = ref([]);
+let paginateEmpData = ref([]);
 
 const open = ref(false)
 const employeeId = ref("");
@@ -98,9 +99,9 @@ onBeforeMount(async () => {
     }
     else if(allEmployeeData.value.length > 0){
         
-        const paginationData = allEmployeeData.value.slice(0, 10);
+        paginateEmpData.value = allEmployeeData.value.slice(0, 10);
         
-        employeeDatas.value = paginationData
+        employeeDatas.value = paginateEmpData.value
         
         document.getElementById("prevBtn").disabled = true;
         
@@ -128,7 +129,7 @@ onBeforeUpdate(async () => {
         document.getElementById("nextBtn").disabled = true;
         
     }
-    else if(paginationData.length >= endNumber){
+    else if(allEmployeeData.value.length >= endNumber){
         
         employeeDatas.value = paginationData;
 
@@ -145,10 +146,20 @@ onBeforeUpdate(async () => {
     }
     else{
         
-        employeeDatas.value = paginationData;
-
-        document.getElementById("nextBtn").disabled = true;;
-
+        if(paginationData == undefined){
+            employeeDatas.value = paginateEmpData.value
+        }
+        else{
+            console.log(endNumber);
+            employeeDatas.value = paginationData;
+        }
+        
+        if(allEmployeeData.value.length <= endNumber){
+            document.getElementById("nextBtn").disabled = true;
+        }
+        else{
+            document.getElementById("nextBtn").disabled = false;
+        }
     }
 
 })
