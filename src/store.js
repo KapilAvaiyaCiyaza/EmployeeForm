@@ -95,7 +95,7 @@ const employeeStore = reactive({
 
         const employeeData = JSON.parse(await get("employeeData"));
 
-        const filterEmployeeData = employeeData.filter((value) => value.id == name || value.name == name || value.email == name || value.number == name || value.address == name || value.designation == name || value.salary == name || value.work == name);
+        const filterEmployeeData = employeeData.filter((value) => value.id == name || value.name == name || value.email == name || value.number == name || value.address == name || value.designation == name || value.salary.toString().replace(/\,/g, "") == name || value.work == name);
 
         if (filterEmployeeData.length == 0 || name.length == 0) {
             
@@ -206,6 +206,18 @@ const employeeStore = reactive({
             endNumber = 10;
             return sortData;
         },
+        sortByHobbies: async function(data){
+            const empData = await JSON.parse(JSON.stringify(data));
+            order = !order;
+            sortData = empData.sort((a, b) => {
+                return (order) ? (a.hobbies[0] < b.hobbies[0]) ? -1 : 1 : (a.hobbies[0] > b.hobbies[0]) ? -1 : 1;
+            })
+            await set(JSON.stringify(sortData), "employeeData");
+            pageNumber = 0;
+            startNumber = 0;
+            endNumber = 10;
+            return sortData;
+        }
     }
 })
 

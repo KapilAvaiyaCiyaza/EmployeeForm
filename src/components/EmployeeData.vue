@@ -11,7 +11,7 @@
                     <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">Designation <span class=" ms-1" style="cursor: pointer;" @click="sortByEmpData('designation')"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
                     <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">Salary <span class=" ms-1" style="cursor: pointer;" @click="sortByEmpData('salary')"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
                     <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">Work <span class=" ms-1" style="cursor: pointer;" @click="sortByEmpData('work')"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
-                    <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">Hobbies <span class=" ms-1" style="cursor: pointer;"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
+                    <th scope="col" class="px-6 py-3"><span class="flex flex-wrap items-center">Hobbies <span class=" ms-1" style="cursor: pointer;" @click="sortByEmpData('hobbies')"><ArrowsUpDownIcon class="text-black w-4" aria-hidden="true" /></span></span></th>
                     <th scope="col" class="px-6 py-3">Actions</th>
                 </tr>
             </thead>
@@ -76,104 +76,104 @@ import employeeStore from "../store"
 
 let employeeDatas = ref([]);
 let allEmployeeData = ref([]);
+let employeeDataAll = ref([]);
 let filterData = ref([]);
 let paginateEmpData = ref([]);
 let sortData = ref([]);
+let startNumber = ref('');
+let endNumber = ref('');
 
 const open = ref(false)
 const employeeId = ref("");
-
 const props = defineProps(['empPaginateData', 'filterEmpData']);
 
 onBeforeMount(async () => {
-
     const allData = await employeeStore.getEmployeeData();
 
     allEmployeeData.value = await JSON.parse(allData);
     employeeDatas.value = await JSON.parse(allData);
+    employeeDataAll.value = await JSON.parse(allData);
 
-    if(allEmployeeData.value.length > 0){
-        
+    startNumber.value = await props.empPaginateData.startNumber;
+    endNumber.value = await props.empPaginateData.endNumber;
+
+    if(allEmployeeData.value.length > 0 || startNumber.value == undefined || endNumber.value == undefined){
         paginateEmpData.value = allEmployeeData.value.slice(0, 10);
-        
         employeeDatas.value = paginateEmpData.value
         
         document.getElementById("prevBtn").disabled = true;
-        
     }
     else if(10 == allEmployeeData.value.length) {
-        
         document.getElementById("prevBtn").disabled = true;
         document.getElementById("nextBtn").disabled = true;
-
     }
     else{
-
         document.getElementById("prevBtn").disabled = false;
         document.getElementById("nextBtn").disabled = false;
-
     }
-
 })
 
 onBeforeUpdate(async () => {
-
     const paginationData = await props.empPaginateData.paginateData;
-    const startNumber = await props.empPaginateData.startNumber;
-    const endNumber = await props.empPaginateData.endNumber;
-
+    startNumber.value = await props.empPaginateData.startNumber;
+    endNumber.value = await props.empPaginateData.endNumber;
     filterData.value = await props.filterEmpData;
         
     if(filterData.value.length !== 0){
-        
         employeeDatas.value = filterData.value
         document.getElementById("nextBtn").disabled = true;
-
         sortData.value = [];
-
     }
-    else if(allEmployeeData.value.length >= endNumber){
-        
+    else if(allEmployeeData.value.length > endNumber.value){
         employeeDatas.value = paginationData;
-
-        if(startNumber == 0){
+    
+        if(startNumber.value == 0){
             document.getElementById("prevBtn").disabled = true;
             document.getElementById("nextBtn").disabled = false;   
+            allEmployeeData.value = paginateEmpData.value;
         }
         else{
             document.getElementById("prevBtn").disabled = false;
+            allEmployeeData.value = paginationData;
         }
-
-        
     }
     else if(sortData.value.length > 0){
-        
-        allEmployeeData.value = sortData.value;
-
-    }
+        if(startNumber.value == undefined || endNumber.value == undefined){
+            allEmployeeData.value = sortData.value;
+            sortData.value = [];
+        }
+        else{
+            allEmployeeData.value = sortData.value;
+            sortData.value = [];
+            
+            if(allEmployeeData.value.length <= endNumber.value){
+                document.getElementById("nextBtn").disabled = true;
+            }
+            else{
+                document.getElementById("nextBtn").disabled = false;
+            }
+        }
+    }   
     else{   
-
-        sortData.value = []
-
         if(paginationData == undefined){
-            employeeDatas.value = paginateEmpData.value
+            employeeDatas.value = paginateEmpData.value;
         }
         else{
             employeeDatas.value = paginationData;
+            sortData.value = [];
         }
         
-        if(allEmployeeData.value.length <= endNumber){
+        if(employeeDataAll.value.length < endNumber.value || employeeDataAll.value.length == endNumber.value){
             document.getElementById("nextBtn").disabled = true;
         }
         else{
             document.getElementById("nextBtn").disabled = false;
+            allEmployeeData.value = employeeDataAll.value;
         }
     }
-
 })
 
 const sortByEmpData = async (name) => {
-
     const empData = await JSON.parse(JSON.stringify(allEmployeeData.value));
     let sortEmpData = [];
     
@@ -201,9 +201,12 @@ const sortByEmpData = async (name) => {
     else if(name == "work"){
         sortEmpData = await employeeStore.sortEmployeeData.sortByWork(empData);
     }
+    else if(name == "hobbies"){
+        sortEmpData = await employeeStore.sortEmployeeData.sortByHobbies(empData);
+    }
 
     sortData.value = await sortEmpData;
-    employeeDatas.value = sortEmpData.slice(0, 10);
-    allEmployeeData.value = sortEmpData;
+    employeeDatas.value = sortEmpData.slice(startNumber.value ? startNumber.value : 0, endNumber.value ? endNumber.value : 10);
+    allEmployeeData.value = sortEmpData.slice(startNumber.value ? startNumber.value : 0, endNumber.value ? endNumber.value : 10);
 }
 </script>

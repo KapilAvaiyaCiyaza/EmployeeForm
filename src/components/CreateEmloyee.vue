@@ -41,7 +41,12 @@ onBeforeMount(async () => {
 
     const oldEmployeeData = employeeData.filter((value) => value.id == updateEmployeeId.value.params.id)
 
+    const numberFormateNew = oldEmployeeData[0].salary;
+    const numberFormateOld = numberFormateNew.toString().replace(/\,/g, "");
+
     newModel.value = oldEmployeeData[0];
+    newModel.value.salary = numberFormateOld;
+    
 })
 
 onBeforeRouteLeave((to, from) => {
@@ -64,7 +69,11 @@ const employeeForm = async (data) => {
         updateHobbies.push(data.hobbies[item])
     }
 
+    
     if (employeeId == 0) {
+
+        const salaryFormateOld = data.salary;
+        const salaryFormateNew = salaryFormateOld.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
         const employeeData = {
             id: Math.floor(Math.random() * 9999),
@@ -73,7 +82,7 @@ const employeeForm = async (data) => {
             number: data.number,
             address: data.address,
             designation: data.designation,
-            salary: data.salary,
+            salary: salaryFormateNew,
             work: data.work,
             hobbies: updateHobbies
         }
@@ -85,9 +94,12 @@ const employeeForm = async (data) => {
     }
     else{
 
+        const salaryFormateOld = newModel.value.salary;
+        const salaryFormateNew = salaryFormateOld.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
         allEmployeeData.value = JSON.parse(await get("employeeData"));
 
-        const updatedEmployeeData = allEmployeeData.value.map((value) => value.id == document.getElementById("employeeId").value ? { ...value, name: newModel.value.name, email: newModel.value.email, number: newModel.value.number, address: newModel.value.address, designation: newModel.value.designation, salary: newModel.value.salary, work: newModel.value.work, hobbies: updateHobbies } : value);
+        const updatedEmployeeData = allEmployeeData.value.map((value) => value.id == document.getElementById("employeeId").value ? { ...value, name: newModel.value.name, email: newModel.value.email, number: newModel.value.number, address: newModel.value.address, designation: newModel.value.designation, salary: salaryFormateNew, work: newModel.value.work, hobbies: updateHobbies } : value);
 
         employeeStore.setEmployeeData(updatedEmployeeData)
         
