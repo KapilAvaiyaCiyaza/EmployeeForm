@@ -93,14 +93,12 @@ onBeforeMount(async () => {
     allEmployeeData.value = await JSON.parse(allData);
     employeeDatas.value = await JSON.parse(allData);
     employeeDataAll.value = await JSON.parse(allData);
-
     startNumber.value = await props.empPaginateData.startNumber;
     endNumber.value = await props.empPaginateData.endNumber;
 
     if(allEmployeeData.value.length > 0 || startNumber.value == undefined || endNumber.value == undefined){
         paginateEmpData.value = allEmployeeData.value.slice(0, 10);
         employeeDatas.value = paginateEmpData.value
-        
         document.getElementById("prevBtn").disabled = true;
     }
     else if(10 == allEmployeeData.value.length) {
@@ -126,50 +124,14 @@ onBeforeUpdate(async () => {
     }
     else if(allEmployeeData.value.length > endNumber.value){
         employeeDatas.value = paginationData;
-    
-        if(startNumber.value == 0){
-            document.getElementById("prevBtn").disabled = true;
-            document.getElementById("nextBtn").disabled = false;   
-            allEmployeeData.value = paginateEmpData.value;
-        }
-        else{
-            document.getElementById("prevBtn").disabled = false;
-            allEmployeeData.value = paginationData;
-        }
+        startNumber.value == 0 ? (document.getElementById("prevBtn").disabled = true, document.getElementById("nextBtn").disabled = false, allEmployeeData.value = paginateEmpData.value) : (document.getElementById("prevBtn").disabled = false, allEmployeeData.value = paginationData);
     }
     else if(sortData.value.length > 0){
-        if(startNumber.value == undefined || endNumber.value == undefined){
-            allEmployeeData.value = sortData.value;
-            sortData.value = [];
-        }
-        else{
-            allEmployeeData.value = sortData.value;
-            sortData.value = [];
-            
-            if(allEmployeeData.value.length <= endNumber.value){
-                document.getElementById("nextBtn").disabled = true;
-            }
-            else{
-                document.getElementById("nextBtn").disabled = false;
-            }
-        }
+        startNumber.value == undefined || endNumber.value == undefined ? (allEmployeeData.value = sortData.value, sortData.value = []) : (allEmployeeData.value = sortData.value, sortData.value = []), allEmployeeData.value.length <= endNumber.value ? document.getElementById("nextBtn").disabled = true : document.getElementById("nextBtn").disabled = false;
     }   
-    else{   
-        if(paginationData == undefined){
-            employeeDatas.value = paginateEmpData.value;
-        }
-        else{
-            employeeDatas.value = paginationData;
-            sortData.value = [];
-        }
-        
-        if(employeeDataAll.value.length < endNumber.value || employeeDataAll.value.length == endNumber.value){
-            document.getElementById("nextBtn").disabled = true;
-        }
-        else{
-            document.getElementById("nextBtn").disabled = false;
-            allEmployeeData.value = employeeDataAll.value;
-        }
+    else{ 
+        paginationData == undefined ? employeeDatas.value = paginateEmpData.value : (employeeDatas.value = paginationData, sortData.value = []);
+        employeeDataAll.value.length < endNumber.value || employeeDataAll.value.length == endNumber.value ? document.getElementById("nextBtn").disabled = true : (document.getElementById("nextBtn").disabled = false, allEmployeeData.value = employeeDataAll.value);
     }
 })
 

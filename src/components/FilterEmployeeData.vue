@@ -10,27 +10,14 @@
 <script setup>
 import { onBeforeMount, ref } from "vue";
 import { get } from './EmployeeIdb.vue';
-import employeeStore from "../store"
 
 const filterDataName = ref("");
 const employeeData = ref([]);
-
 let filterShow = ref(false);
 let showFilterBtn = ref(false);
 
 onBeforeMount(async () => {
-
     employeeData.value = JSON.parse(await get("employeeData"));
-
-    if(employeeData.value.length == 0 || employeeData.value.length == undefined){
-        filterShow.value = false;
-        showFilterBtn.value = false
-    }
-    else{
-        filterShow.value = false;
-        showFilterBtn.value = true;
-    }
-    
+    employeeData.value.length == 0 || employeeData.value.length == undefined ? (filterShow.value = false, showFilterBtn.value = false) : (filterShow.value = false, showFilterBtn.value = true);
 })
-
 </script>

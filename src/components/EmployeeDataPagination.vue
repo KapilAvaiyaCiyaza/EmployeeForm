@@ -37,10 +37,8 @@ import employeeStore from "../store"
 
 let employeeDatas = ref([]);
 let allEmployeeData = ref([]);
-
 let startNumber = 0;
 let endNumber = 10;
-
 const props = defineProps(['empPaginateData']);
 
 onBeforeMount(async () => {    
@@ -49,14 +47,12 @@ onBeforeMount(async () => {
 })
 
 onBeforeUpdate(() => {
-
     startNumber = props.empPaginateData.startNumber;
     endNumber = props.empPaginateData.endNumber;
-
+    
     if(startNumber == undefined || endNumber == undefined){
         startNumber = 0;
         endNumber = 10;
     }
-
 })
 </script>

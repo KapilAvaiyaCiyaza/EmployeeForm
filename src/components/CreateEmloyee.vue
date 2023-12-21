@@ -24,54 +24,39 @@ import { onBeforeRouteLeave, useRoute } from 'vue-router'
 
 let newModel = ref({});
 let allEmployeeData = ref([]);
-
-const route = useRoute();
-
 let employeeData = [];
 let updateEmployeeId = ref("");
+const route = useRoute();
 
 onBeforeMount(async () => {
-
     const allData = await employeeStore.getEmployeeData();
     allEmployeeData.value = await JSON.parse(allData);
-
     employeeData = JSON.parse(JSON.stringify(allEmployeeData.value));
-
     updateEmployeeId.value = route;
-
     const oldEmployeeData = employeeData.filter((value) => value.id == updateEmployeeId.value.params.id)
-
     const numberFormateNew = oldEmployeeData[0].salary;
     const numberFormateOld = numberFormateNew.toString().replace(/\,/g, "");
-
     newModel.value = oldEmployeeData[0];
     newModel.value.salary = numberFormateOld;
-    
 })
 
 onBeforeRouteLeave((to, from) => {
-
     if(to.path == "/createemployee"){
         newModel.value = {};
         document.getElementById("employeeId").value = 0;
         updateEmployeeId.value = 0
     }
-
 })
 
 const employeeForm = async (data) => {
-
     const employeeId = document.getElementById("employeeId").value;
-
     const updateHobbies = [];
 
     for (const item in data.hobbies) {
         updateHobbies.push(data.hobbies[item])
     }
-
     
     if (employeeId == 0) {
-
         const salaryFormateOld = data.salary;
         const salaryFormateNew = salaryFormateOld.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
@@ -86,29 +71,18 @@ const employeeForm = async (data) => {
             work: data.work,
             hobbies: updateHobbies
         }
-
         allEmployeeData.value.push(employeeData);
-
         employeeStore.setEmployeeData(allEmployeeData.value)
-
     }
     else{
-
         const salaryFormateOld = newModel.value.salary;
         const salaryFormateNew = salaryFormateOld.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
         allEmployeeData.value = JSON.parse(await get("employeeData"));
-
         const updatedEmployeeData = allEmployeeData.value.map((value) => value.id == document.getElementById("employeeId").value ? { ...value, name: newModel.value.name, email: newModel.value.email, number: newModel.value.number, address: newModel.value.address, designation: newModel.value.designation, salary: salaryFormateNew, work: newModel.value.work, hobbies: updateHobbies } : value);
-
         employeeStore.setEmployeeData(updatedEmployeeData)
-        
     }
 
     document.getElementById("employeeId").value = 0;
-
     router.push("/employeelist");
-
 }
-
 </script>
