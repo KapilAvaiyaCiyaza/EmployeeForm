@@ -18,9 +18,7 @@ let paginationData = ref({});
 let filterData = ref([]);
 let showForm = ref(false);
 
-
 onBeforeMount(async () => {
-
     const blankData = await get("employeeData");
 
     if(blankData == undefined){
@@ -31,44 +29,22 @@ onBeforeMount(async () => {
     allEmployeeData.value = JSON.parse(await get("employeeData"));
     employeeDatas.value = allEmployeeData.value;
 
-    if(allEmployeeData.value.length > 0){
-        showForm.value = false
-    }
-    else{
-        showForm.value = true
-        document.getElementById("showHideForm").disabled = true;
-    }
-
-    if(allEmployeeData.value.length <= 10){
-        document.getElementById("nextBtn").disabled = true;
-    }
-    else{
-        document.getElementById("nextBtn").disabled = false;
-    }
-
+    allEmployeeData.value.length > 0 ? showForm.value = false : (showForm.value = true, document.getElementById("showHideForm").disabled = true);
+    allEmployeeData.value.length <= 10 ? document.getElementById("nextBtn").disabled = true : document.getElementById("nextBtn").disabled = false;
 })
 
 const filterEmployeeData = async (data) => {
-
     const filterempData = await employeeStore.filterEmployeeData(data);
-
     filterData.value = await filterempData;
-
 }
 
 const prevPage = async (data) => {
-
     const paginateData = await data;
-
     paginationData.value = paginateData;
-
 }
 
 const nextPage = async (data) => {
-
     const paginateData = await data;
-
     paginationData.value = paginateData;
-
 }
 </script>
